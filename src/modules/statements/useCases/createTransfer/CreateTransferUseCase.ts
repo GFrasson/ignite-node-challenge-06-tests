@@ -22,13 +22,13 @@ class CreateTransferUseCase {
   ) {}
 
   async execute({ amount, description, sender_id, user_id }: IRequest): Promise<Statement> {
-    const user = this.usersRepository.findById(user_id);
+    const user = await this.usersRepository.findById(user_id);
 
     if (!user) {
       throw new CreateTransferError.UserNotFound();
     }
 
-    const sender = this.usersRepository.findById(sender_id);
+    const sender = await this.usersRepository.findById(sender_id);
 
     if (!sender) {
       throw new CreateTransferError.SenderUserNotFound();
