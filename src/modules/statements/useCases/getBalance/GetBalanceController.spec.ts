@@ -1,8 +1,10 @@
+import { sign } from 'jsonwebtoken';
 import request from 'supertest';
 import { Connection } from 'typeorm';
 
 import { app } from '../../../../app';
 import createConnection from '../../../../database'
+import authConfig from '../../../../config/auth';
 
 let connection: Connection;
 let token: string;
@@ -41,7 +43,13 @@ describe('Get Balance Controller', () => {
   });
 
   it('should not be able to get the balance of an user that does not exist', async () => {
-    const fakeToken: string = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiMzI5YTIyYjktM2JmOC00ZTVjLWFjODAtMGUyZjEzN2E4NzU3IiwibmFtZSI6IlVzZXIgdGVzdCIsImVtYWlsIjoidGVzdEBlbWFpbC5jb20iLCJwYXNzd29yZCI6IiQyYSQwOCRTQmN0VjV4N1RzTnFqdGoycGRyZDZlN2dveXp4a2hCZURLRElqSWxwZVpqTk1SOVVOVlN2dSIsImNyZWF0ZWRfYXQiOiIyMDIyLTA3LTE4VDE5OjQ2OjQyLjY0OFoiLCJ1cGRhdGVkX2F0IjoiMjAyMi0wNy0xOFQxOTo0Njo0Mi42NDhaIn0sImlhdCI6MTY1ODE2MjgwMiwiZXhwIjoxNjU4MjQ5MjAyLCJzdWIiOiIzMjlhMjJiOS0zYmY4LTRlNWMtYWM4MC0wZTJmMTM3YTg3NTcifQ.tL_XI4s0RQ5vzxWDlqLDLyvP345FocXRdxFdz1kUuww";
+    const fakeUserId = "98a19a2a-7ade-407e-b64d-89695e0470e9";
+    const { secret, expiresIn } = authConfig.jwt;
+
+    const fakeToken = sign({}, secret, {
+      subject: fakeUserId,
+      expiresIn,
+    });
 
     const response = await request(app).get("/api/v1/statements/balance").set({
       Authorization: `Bearer ${fakeToken}`
